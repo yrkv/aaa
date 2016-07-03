@@ -1,6 +1,6 @@
 
 var spriteSheet = new Image();
-spriteSheet.src = "spriteSheet.png";
+spriteSheet.src = "spriteSheet1.png";
 
 
 $(document).ready(function() {
