@@ -26,9 +26,8 @@ game.tiles[1] = new Tile(spriteSheet, 0, 1, false);
 
 
 function convertPixel(pixel) {
-    pixel = "" + pixel[0] + " " + pixel[1] + " " + pixel[2] + " " + pixel[3];
-    switch (pixel) {
-        case "80 92 143 255": return 1;
+    switch (pixel.toString) {
+        case "80,92,143,255": return 1;
         default: return 0;
     }
 }
