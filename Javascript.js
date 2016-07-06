@@ -1,3 +1,5 @@
+var fps, ups;
+
 const tileSize = 48;
 var running = false;
 var totalTicks = 0;
@@ -71,10 +73,10 @@ document.onkeyup = function(e) {
 }
 
 function update() {
-    if (keys[38]) player.y--;
-    if (keys[40]) player.y++;
-    if (keys[37]) player.x--;
-    if (keys[39]) player.x++;
+    if (keys[38]) player.y -= 5;
+    if (keys[40]) player.y += 5;
+    if (keys[37]) player.x -= 5;
+    if (keys[39]) player.x += 5;
 }
 
 function render() {
@@ -115,6 +117,8 @@ function run() {
             if (+(new Date) - timer > 1000) {
                 timer += 1000;
 //                console.log("fps: " + frames + ", ups:" + updates);
+                ups = updates;
+                fps = frames;
                 frames = 0;
                 updates = 0;
             }
