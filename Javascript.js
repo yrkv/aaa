@@ -1,5 +1,4 @@
 var fps, ups;
-
 const tileSize = 48;
 var running = false;
 var totalTicks = 0;
@@ -16,6 +15,17 @@ var mapImage = new Image();
 var player = {};
 player.x = 0;
 player.y = 0;
+player.collide = function(x, y) {
+    if ((game.tiles[game.map[(x - (x % tileSize)) / tileSize][(y - (y % tileSize)) / tileSize]].collision) ||
+        (game.tiles[game.map[(x + tileSize - 1 - ((x + tileSize - 1) % tileSize)) / tileSize][(y - (y % tileSize)) / tileSize]].collision) ||
+        (game.tiles[game.map[(x - (x % tileSize)) / tileSize][(y + tileSize - 1 - ((y + tileSize - 1) % tileSize)) / tileSize]].collision) ||
+        (game.tiles[game.map[(x + tileSize - 1 - ((x + tileSize - 1) % tileSize)) / tileSize][(y + tileSize - 1 - ((y + tileSize - 1) % tileSize)) / tileSize]].collision)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 
 var game = {};
 game.map = [];
@@ -23,11 +33,12 @@ game.map = [];
 game.tiles = [];
 game.tiles[0] = new Tile(spriteSheet, 0, 2, false);
 game.tiles[1] = new Tile(spriteSheet, 0, 1, false);
-
+game.tiles[2] = new Tile(spriteSheet, 0, 3, true);
 
 function convertPixel(pixel) {
-    switch (pixel.toString) {
+    switch (pixel.toString()) {
         case "80,92,143,255": return 1;
+        case "255,0,0,255": return 2;
         default: return 0;
     }
 }
@@ -53,43 +64,54 @@ spriteSheet.src = "spriteSheet1.png";
 
 var canvas, context;
 
+function setPixelated(context){
+    context['imageSmoothingEnabled'] = false;       /* standard */
+    context['mozImageSmoothingEnabled'] = false;    /* Firefox */
+    context['oImageSmoothingEnabled'] = false;      /* Opera */
+    context['webkitImageSmoothingEnabled'] = false; /* Safari */
+    context['msImageSmoothingEnabled'] = false;     /* IE */
+}
+
 setTimeout(function() {
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
-    context.imageSmoothingEnabled = false;
+    setPixelated(context);
     running = true;
+    loadMap("mapImage.png");
+    run();
 },1);
 
 var keys = [];
 document.onkeydown = function(e) {
     keys[e.keyCode] = true;
-    console.log(player.x + ", " + player.y);
 }
 
 document.onkeyup = function(e) {
     keys[e.keyCode] = false;
-    console.log(player.x + ", " + player.y);
 }
 
 function update() {
-    if (keys[38]) player.y -= 5;
-    if (keys[40]) player.y += 5;
-    if (keys[37]) player.x -= 5;
-    if (keys[39]) player.x += 5;
+    for(var i = 0; i < 5; i++) {
+        if (keys[38] && !player.collide(player.x, player.y-1)) player.y -= 1;
+        if (keys[40] && !player.collide(player.x, player.y+1)) player.y += 1;
+        if (keys[37] && !player.collide(player.x-1, player.y)) player.x -= 1;
+        if (keys[39] && !player.collide(player.x+1, player.y)) player.x += 1;
+    }
 }
 
 function render() {
     canvas.width = canvas.width;
     for (var x = 0; x < game.map.length; x++) {
         for (var y = 0; y < game.map[0].length; y++) {
-            if (x * tileSize - player.x >= -tileSize &&
-                y * tileSize - player.y >= -tileSize &&
-                x * tileSize - player.x <= tileSize * 16 &&
-                y * tileSize - player.y <= tileSize * 16) {
-                context.drawImage(spriteSheet, game.tiles[game.map[x][y]].x * 16, game.tiles[game.map[x][y]].y * 16, 16, 16, x*tileSize-player.x, y*tileSize-player.y, tileSize, tileSize);
+            if (x * tileSize - player.x + (canvas.height/2-8) >= -tileSize &&
+                y * tileSize - player.y + (canvas.height/2-8) >= -tileSize &&
+                x * tileSize - player.x + (canvas.height/2-8) <= tileSize * 16 &&
+                y * tileSize - player.y + (canvas.height/2-8) <= tileSize * 16) {
+                context.drawImage(spriteSheet, game.tiles[game.map[x][y]].x * 16, game.tiles[game.map[x][y]].y * 16, 16, 16, x*tileSize-player.x+(canvas.height/2-8), y*tileSize-player.y+(canvas.height/2-8), tileSize, tileSize);
             }
         }
     }
+    context.drawImage(spriteSheet, 0, 0, 16, 16, canvas.width/2-8, canvas.height/2-8, 48, 48);
 }
 
 function run() {
