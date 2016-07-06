@@ -1,4 +1,4 @@
-
+const tileSize = 48;
 var running = false;
 var totalTicks = 0;
 
@@ -10,6 +10,10 @@ function Tile(spriteSheet, x, y, collision) {
 }
 
 var mapImage = new Image();
+
+var player = {};
+player.x = 0;
+player.y = 0;
 
 var game = {};
 game.map = [];
@@ -40,7 +44,7 @@ function loadMap(src) {
                 game.map[x][y] = convertPixel(data);
             }
         }
-    },10)
+    },10);
 }
 
 var spriteSheet = new Image();
@@ -55,14 +59,34 @@ setTimeout(function() {
     running = true;
 },1);
 
+var keys = [];
+document.onkeydown = function(e) {
+    keys[e.keyCode] = true;
+    console.log(player.x + ", " + player.y);
+}
+
+document.onkeyup = function(e) {
+    keys[e.keyCode] = false;
+    console.log(player.x + ", " + player.y);
+}
+
 function update() {
-    
+    if (keys[38]) player.y--;
+    if (keys[40]) player.y++;
+    if (keys[37]) player.x--;
+    if (keys[39]) player.x++;
 }
 
 function render() {
-    for (var x = 0; x < 16; x++) {
-        for (var y = 0; y < 16; y++) {
-            context.drawImage(spriteSheet, game.tiles[game.map[x][y]].x * 16, game.tiles[game.map[x][y]].y * 16, 16, 16, x*16, y*16, 16, 16);
+    canvas.width = canvas.width;
+    for (var x = 0; x < game.map.length; x++) {
+        for (var y = 0; y < game.map[0].length; y++) {
+            if (x * tileSize - player.x >= -tileSize &&
+                y * tileSize - player.y >= -tileSize &&
+                x * tileSize - player.x <= tileSize * 16 &&
+                y * tileSize - player.y <= tileSize * 16) {
+                context.drawImage(spriteSheet, game.tiles[game.map[x][y]].x * 16, game.tiles[game.map[x][y]].y * 16, 16, 16, x*tileSize-player.x, y*tileSize-player.y, tileSize, tileSize);
+            }
         }
     }
 }
@@ -90,7 +114,7 @@ function run() {
 
             if (+(new Date) - timer > 1000) {
                 timer += 1000;
-                console.log("fps: " + frames + ", ups:" + updates);
+//                console.log("fps: " + frames + ", ups:" + updates);
                 frames = 0;
                 updates = 0;
             }
