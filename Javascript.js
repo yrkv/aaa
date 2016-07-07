@@ -27,6 +27,17 @@ player.collide = function(x, y) {
     }
 }
 
+player.move = function() {
+    if (keys[38] && !player.collide(player.x, player.y-1)) player.y -= 1;
+    if (keys[40] && !player.collide(player.x, player.y+1)) player.y += 1;
+    if (keys[37] && !player.collide(player.x-1, player.y)) player.x -= 1;
+    if (keys[39] && !player.collide(player.x+1, player.y)) player.x += 1;
+}
+
+player.update = function() {
+    
+}
+
 var game = {};
 game.map = [];
 
@@ -92,10 +103,7 @@ document.onkeyup = function(e) {
 
 function update() {
     for(var i = 0; i < 5; i++) {
-        if (keys[38] && !player.collide(player.x, player.y-1)) player.y -= 1;
-        if (keys[40] && !player.collide(player.x, player.y+1)) player.y += 1;
-        if (keys[37] && !player.collide(player.x-1, player.y)) player.x -= 1;
-        if (keys[39] && !player.collide(player.x+1, player.y)) player.x += 1;
+        player.move();
     }
 }
 
